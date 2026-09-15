@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useMemo } from "react";
 import { SandpackProvider, SandpackPreview, SandpackCodeEditor, SandpackLayout } from "@codesandbox/sandpack-react";
 
 interface CodePreviewProps {
@@ -49,15 +50,96 @@ export default function App() {
 }`;
 
 export default function CustomSandpackPreview({ code, codeOnly = false, previewOnly = false }: CodePreviewProps) {
-  const displayCode = code && code.trim().length > 0 ? code : DEFAULT_CODE;
+  const [useInstantIframe, setUseInstantIframe] = useState<boolean>(false);
+
+  const { cleanCode, isHtml, htmlDoc } = useMemo(() => {
+    let raw = code && code.trim().length > 0 ? code : DEFAULT_CODE;
+    // Strip markdown codeblock backticks if present
+    raw = raw.replace(/^```[a-zA-Z]*\n?/, "").replace(/\n?```$/, "").trim();
+
+    const isHtmlDoc = /^\s*<!DOCTYPE html/i.test(raw) || /^\s*<html/i.test(raw);
+
+    if (isHtmlDoc) {
+      return { cleanCode: raw, isHtml: true, htmlDoc: raw };
+    }
+
+    // Wrap React code into a standalone HTML doc with Babel & Tailwind CDN for 100% reliable instant preview fallback
+    const convertedHtmlDoc = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <style>
+    body { margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="text/babel">
+    ${raw.replace(/import\s+.*?from\s+['"].*?['"];?/g, "")}
+
+    if (typeof App !== 'undefined') {
+      const root = ReactDOM.createRoot(document.getElementById('root'));
+      root.render(<App />);
+    } else {
+      document.getElementById('root').innerHTML = '<div style="padding:20px;font-family:sans-serif;">Component ready</div>';
+    }
+  </script>
+</body>
+</html>`;
+
+    return { cleanCode: raw, isHtml: false, htmlDoc: convertedHtmlDoc };
+  }, [code]);
+
+  // If the generated code is pure HTML OR if instant iframe mode is enabled, render the native iframe directly
+  if (isHtml || useInstantIframe) {
+    return (
+      <div className="w-full h-full min-h-[600px] rounded-2xl overflow-hidden border border-blue-200/90 bg-white shadow-xl flex flex-col">
+        <div className="px-4 py-2 bg-slate-100 border-b border-slate-200 flex items-center justify-between text-xs text-slate-600 font-semibold">
+          <span className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            Instant Live Preview (HTML / Browser Compiled)
+          </span>
+          {!isHtml && (
+            <button
+              onClick={() => setUseInstantIframe(false)}
+              className="text-blue-600 hover:underline font-bold cursor-pointer"
+            >
+              Switch to Sandpack IDE
+            </button>
+          )}
+        </div>
+        <iframe
+          srcDoc={htmlDoc}
+          className="w-full flex-1 min-h-[550px] border-none"
+          title="Live Output Preview"
+          sandbox="allow-scripts allow-same-origin allow-modals allow-forms"
+        />
+      </div>
+    );
+  }
 
   return (
-    <div className="w-full rounded-2xl overflow-hidden border border-blue-200/90 bg-[#F0F7FF] shadow-xl shadow-blue-900/5">
+    <div className="w-full rounded-2xl overflow-hidden border border-blue-200/90 bg-[#F0F7FF] shadow-xl shadow-blue-900/5 flex flex-col">
+      <div className="px-4 py-1.5 bg-blue-50/90 border-b border-blue-200/80 flex items-center justify-between text-[11px] text-slate-600 font-medium">
+        <span>DevForge Sandpack Bundler</span>
+        <button
+          onClick={() => setUseInstantIframe(true)}
+          className="text-blue-600 font-bold hover:underline cursor-pointer"
+        >
+          Taking long? Load Instant Preview ⚡
+        </button>
+      </div>
+
       <SandpackProvider
         template="react-ts"
         theme="light"
         files={{
-          "/App.tsx": displayCode,
+          "/App.tsx": cleanCode,
           "/index.tsx": `import React, { useEffect } from "react";
 import { createRoot } from "react-dom/client";
 import App from "./App";

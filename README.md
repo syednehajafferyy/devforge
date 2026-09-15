@@ -1,121 +1,200 @@
-# DevForge AI
+# 🚀 DevForge — AI-Powered Web App Builder & Lead Generation Platform
 
-An AI-powered full-stack UI builder: describe a site in plain language, watch it compile live in
-an in-browser sandbox, adjust its look with no-code style controls, and ship it to a real GitHub
-repository with a live URL — all from one page. Built for the Level 4 OJT assessment brief.
+> **Build, Preview, Scrap Leads, and Deploy Full-Stack Web Applications in Seconds with AI.**
 
-## Feature map
+DevForge is an all-in-one AI platform that empowers developers, agencies, and businesses to generate modern, responsive, full-stack websites and web applications from simple text prompts. It features a streaming code bundler, real-time live preview, an automated lead extraction engine, client outreach tools, and 1-click GitHub & Vercel deployment.
 
-| Brief requirement | Where it lives |
-|---|---|
-| Prompt-driven generation | `app/api/generate/route.ts` (streaming Claude call) + `components/SandpackPreview.tsx` |
-| Template library | `components/TemplateGrid.tsx` |
-| Streaming sandbox | `components/SandpackPreview.tsx` (Sandpack, live preview + console) |
-| Multi-language selector + RTL | `lib/i18n.ts`, `components/LanguageSelector.tsx` |
-| In-app chatbot | `components/ChatWidget.tsx` + `app/api/chat/route.ts` |
-| Schema-driven lead extraction | `lib/schemas.ts` (`LeadDataSchema`) via tool-calling in `app/api/chat/route.ts` |
-| Visual style inspector | `components/StyleInspector.tsx` |
-| Deployment status tracker | `components/DeployStepper.tsx` |
-| GitHub repo automation | `lib/github.ts`, `app/api/deploy/route.ts` |
-| Vercel deploy trigger + webhook | `app/api/deploy/route.ts`, `app/api/webhook/vercel/route.ts` |
-| Auth (GitHub OAuth, repo scope) | `lib/auth.ts`, `app/api/auth/[...nextauth]/route.ts` |
-| Data model | `prisma/schema.prisma` |
+---
 
-## Architecture
+## ⚡ Key Features
+
+- **🤖 Instant AI Web Generation**: Type any website or web app prompt and watch DevForge compile responsive TypeScript/React and HTML/CSS code in real-time. Powered by **Google Gemini AI** and **Anthropic Claude** with dynamic fallback engines.
+- **💻 Dual Sandpack & Instant Preview Engine**: Includes an interactive CodeSandbox-powered Sandpack IDE (with live code editor, console, and error overlay) along with a fallback instant browser-compiled preview engine for zero-lag rendering.
+- **🎯 B2B Lead Finder & Business Scraper**: Discover potential local clients without websites! Search by industry and location (e.g. *"Dentists in Chicago"* or *"Restaurants in Karachi"*), extract business details, contact phone numbers, emails, addresses, ratings, and export leads to CSV.
+- **💬 Client Outreach Assistant**: Built-in AI chat assistant with schema-driven lead capture and automated client proposal generation.
+- **🎨 Visual No-Code Style Inspector**: Inspect and adjust colors, typography, layout tokens, and themes with instant updates.
+- **🚀 1-Click Deployment Pipeline**: Seamlessly push generated projects straight to GitHub repositories and trigger automated production builds on Vercel.
+- **🌐 Internationalization (i18n) & RTL**: Native multi-language support (English, Urdu, Spanish, Arabic, etc.) with automated RTL layout handling.
+- **🔒 Authentication & Data Persistence**: NextAuth session management backed by PostgreSQL & Prisma ORM.
+
+---
+
+## 📁 Repository Structure & Organization
 
 ```
-Browser (Next.js App Router, TS, Tailwind, Zustand)
-   │
-   ├─ / ................... landing: template grid + prompt bar
-   ├─ /login .............. GitHub OAuth sign-in
-   ├─ /dashboard ........... builder workspace
-   │     ├─ SandpackPreview      → streams from /api/generate
-   │     ├─ StyleInspector       → local theme tokens, feeds next generation call
-   │     ├─ ChatWidget           → /api/chat (assistant + lead capture)
-   │     └─ DeployStepper        → /api/deploy, polls status until live
-   │
-   ▼
-Next.js Route Handlers (Node runtime)
-   ├─ /api/auth/[...nextauth]  NextAuth + Prisma adapter, GitHub provider (repo scope)
-   ├─ /api/generate            Anthropic streaming completion → raw TSX
-   ├─ /api/chat                Anthropic + tool-calling → Zod-validated Lead → Postgres
-   ├─ /api/deploy              Octokit: create repo → commit tree → trigger Vercel hook
-   └─ /api/webhook/vercel      Vercel deployment.succeeded → writes liveUrl
-   │
-   ▼
-PostgreSQL (via Prisma): User, Account, Session, Project, Lead
+devforge/
+├── app/                        # Next.js App Router (Pages, API Routes, Layouts)
+│   ├── api/                    # Serverless API Handlers
+│   │   ├── auth/               # NextAuth Authentication & GitHub OAuth
+│   │   ├── chat/               # Assistant & Tool-Calling Lead Extraction
+│   │   ├── deploy/             # GitHub Repository & Vercel Deployment Automation
+│   │   ├── generate/           # AI Web Code Generation (Gemini & Anthropic)
+│   │   ├── leads/              # Lead Data Storage & Export Endpoints
+│   │   ├── scrape-leads/       # OSM & Maps Business Lead Search Engine
+│   │   └── webhook/            # Deployment Status Webhooks
+│   ├── layout.tsx              # Root HTML Layout & Providers
+│   └── page.tsx                # Main Application Workspace (Builder + Leads + Preview)
+├── components/                 # React UI Components
+│   ├── ChatWidget.tsx          # Assistant & Lead Capture Drawer
+│   ├── DeployStepper.tsx       # Live Deployment Tracker Modal
+│   ├── LanguageSelector.tsx    # i18n Language Picker
+│   ├── LeadGenerationModal.tsx # Lead Search & Extraction Suite
+│   ├── SandpackPreview.tsx     # Code Editor & Instant Live Preview Engine
+│   ├── StyleInspector.tsx      # Visual Style & Theme Editor
+│   └── TemplateGrid.tsx       # Starter Web Application Templates
+├── lib/                        # Utility Libraries & Configuration
+│   ├── auth.ts                 # NextAuth Provider Config
+│   ├── github.ts               # GitHub API Client (Octokit)
+│   ├── i18n.ts                 # Multi-language Translations & RTL Logic
+│   └── schemas.ts              # Zod Validation Schemas
+├── prisma/                     # Database Schema & Migrations
+│   └── schema.prisma           # Prisma PostgreSQL Models (User, Project, Lead)
+├── public/                     # Static Assets, Icons, and Logos
+├── scraper/                    # Optional Standalone Python / Docker Scraper Kit
+│   ├── docker-compose.yml      # Containerized Scraper Service
+│   └── scripts/                # Deep Google Maps Scraping Scripts
+├── .env.example                # Template Environment Variables
+├── middleware.ts               # Security & Route Middleware
+├── next.config.mjs             # Next.js Configuration
+└── package.json                # Project Dependencies & Scripts
 ```
 
-### Why these choices
+---
 
-- **Sandpack over a custom iframe runtime** — gives isolated compilation, a console for surfacing
-  build errors, and a live preview without us having to write a bundler.
-- **Streaming generation** — the `/api/generate` route streams tokens directly from the Anthropic
-  SDK's `messages.stream()` into the response body; the client appends chunks straight into the
-  Sandpack file store so code appears as it's written, not after a multi-second wait.
-- **Tool-calling for lead extraction** — rather than regexing chat transcripts, the model is given
-  a `record_lead` tool whose schema mirrors `LeadDataSchema`. It only fires the tool once it has
-  organically gathered real values, and the payload is still re-validated with Zod server-side
-  before it touches the database.
-- **Database-backed sessions + Prisma adapter** — needed so the GitHub OAuth access token
-  (`Account.access_token`) survives between requests; that token is what lets `/api/deploy`
-  create the repo under the *user's* GitHub account rather than a shared service account.
+## 🛠️ Prerequisites
 
-## Setup
+Before getting started, make sure you have the following installed on your machine:
+- **Node.js**: `v18.x` or higher ([Download Node.js](https://nodejs.org/))
+- **npm** or **yarn** or **pnpm**
+- **Git**: ([Download Git](https://git-scm.com/))
+- **Google Gemini API Key**: Free API key from [Google AI Studio](https://aistudio.google.com/app/apikey)
 
-1. **Install dependencies**
+---
+
+## ⚙️ Quick Start (Local Setup)
+
+### 1. Clone the Repository
+```bash
+git clone https://github.com/syednehajafferyy/devforge.git
+cd devforge
+```
+
+### 2. Install Dependencies
+```bash
+npm install
+```
+
+### 3. Set Up Environment Variables
+Copy the `.env.example` file to create your local `.env.local` configuration:
+```bash
+cp .env.example .env.local
+```
+
+Open `.env.local` in your editor and add your credentials:
+```env
+# Required for Google Gemini AI Generation
+GEMINI_API_KEY=your_gemini_api_key_here
+GOOGLE_GENERATIVE_AI_API_KEY=your_gemini_api_key_here
+
+# Required for NextAuth Sessions
+NEXTAUTH_URL=http://localhost:3000
+NEXTAUTH_SECRET=generate_a_random_secret_string
+
+# Optional: PostgreSQL Database connection string (for saving projects & leads)
+DATABASE_URL=postgresql://user:password@localhost:5432/devforge?sslmode=disable
+
+# Optional: Anthropic Claude API Key (fallback model)
+ANTHROPIC_API_KEY=sk-ant-your_anthropic_key
+```
+
+> 🔑 **How to get a FREE Gemini API Key:**
+> 1. Go to [Google AI Studio](https://aistudio.google.com/app/apikey).
+> 2. Sign in with your Google account.
+> 3. Click **"Create API Key"** and copy the generated key into `GEMINI_API_KEY`.
+
+### 4. Push Database Schema (Optional)
+If using PostgreSQL for project persistence:
+```bash
+npx prisma db push
+```
+
+### 5. Launch Development Server
+```bash
+npm run dev
+```
+
+Open `http://localhost:3000` in your web browser to start using DevForge! 🎉
+
+---
+
+## 🌐 How to Make It Live (Deployment Guide)
+
+Deploying DevForge to production is fast and easy using **Vercel**.
+
+### Deploying to Vercel (Step-by-Step)
+
+1. **Push Code to GitHub**:
+   Ensure all changes are pushed to your GitHub repository:
    ```bash
-   npm install
+   git add .
+   git commit -m "Deploy DevForge"
+   git push origin main
    ```
 
-2. **Create a GitHub OAuth App** at github.com/settings/developers
-   - Homepage URL: `http://localhost:3000`
-   - Callback URL: `http://localhost:3000/api/auth/callback/github`
-   - Copy the client ID/secret into `.env.local`
+2. **Import Project into Vercel**:
+   - Go to [Vercel Dashboard](https://vercel.com/dashboard) and click **"Add New..."** -> **"Project"**.
+   - Select your GitHub repository: `syednehajafferyy/devforge`.
 
-3. **Copy the env template and fill it in**
-   ```bash
-   cp .env.example .env.local
-   ```
-   See the table below for what each variable does.
+3. **Configure Environment Variables**:
+   In the Vercel project configuration screen, expand **Environment Variables** and add:
 
-4. **Provision Postgres and push the schema**
-   ```bash
-   npm run db:push
-   ```
+   | Variable Name | Description / Value |
+   |---|---|
+   | `GEMINI_API_KEY` | Your Google Gemini API Key |
+   | `GOOGLE_GENERATIVE_AI_API_KEY` | Same Google Gemini API Key |
+   | `NEXTAUTH_URL` | Your production Vercel domain (e.g. `https://devforge.vercel.app`) |
+   | `NEXTAUTH_SECRET` | Secret key for auth token encryption |
+   | `DATABASE_URL` | PostgreSQL connection string (from Supabase or Neon) |
 
-5. **Run it**
-   ```bash
-   npm run dev
-   ```
+4. **Deploy**:
+   - Click **Deploy**. Vercel will automatically build and publish your site.
+   - Your live website URL will be ready in under 2 minutes (e.g. `https://devforge.vercel.app`)!
 
-## Environment variables
+---
 
-| Variable | Purpose |
-|---|---|
-| `NEXTAUTH_URL` | Base URL NextAuth uses to build callback URLs |
-| `NEXTAUTH_SECRET` | Session encryption secret — generate with `openssl rand -base64 32` |
-| `GITHUB_ID` / `GITHUB_SECRET` | OAuth App credentials; the app requests the `repo` scope so deploys can create repositories on the user's behalf |
-| `DATABASE_URL` | Postgres connection string for Prisma |
-| `ANTHROPIC_API_KEY` | Powers both `/api/generate` (codegen) and `/api/chat` (assistant + lead extraction) |
-| `GITHUB_SERVER_TOKEN` | Optional fallback PAT for server-initiated repo actions outside a user session |
-| `VERCEL_DEPLOY_HOOK_URL` | Deploy Hook URL from the target Vercel project's settings |
-| `VERCEL_WEBHOOK_SECRET` | Verifies the signature on incoming `deployment.succeeded` webhooks |
+## 🗄️ Setting Up a Production Database (Supabase / Neon)
 
-## Known limitations / what to verify before demoing
+For live project saving and lead storage in production:
+1. Create a free PostgreSQL database on [Supabase](https://supabase.com) or [Neon](https://neon.tech).
+2. Copy the Connection String URL.
+3. Add it to `DATABASE_URL` in your Vercel Environment Variables.
+4. Run `npx prisma db push` locally pointing to your production database string to populate tables.
 
-- The `/api/generate` endpoint asks the model for a single self-contained `App.tsx` using only
-  Tailwind + React — it deliberately doesn't support arbitrary npm imports, since Sandpack's
-  `react-ts` template only ships React itself.
-- The Vercel deploy hook fires a build but doesn't return a live URL synchronously; the actual
-  URL arrives via the `deployment.succeeded` webhook in `app/api/webhook/vercel/route.ts`, which
-  you'll need to register in the Vercel project's settings and point at your deployed domain.
-- `DeployStepper` polls `/api/deploy?projectId=` every 4s until the webhook marks the project
-  live — this is a reasonable default for a student project but would want to move to
-  server-sent events or a websocket for a production version.
+---
 
-## Submission checklist
+## 🕷️ Optional: Standalone Deep Scraper Microservice (`scraper/`)
 
-- [ ] Push this repo to a public GitHub repository
-- [ ] Confirm `README.md` (this file) covers architecture + env setup
-- [ ] Record a 3-minute walkthrough demonstrating: prompt → live preview → style edit → deploy → live URL
+DevForge includes a built-in OpenStreetMap fast lead finder out of the box. If you also want to run the advanced Google Maps Python scraper service:
+
+```bash
+cd scraper
+docker-compose up -d --build
+```
+The scraper microservice will run on `http://localhost:8000`. You can set `SCRAPER_URL=http://localhost:8000` in your `.env.local`.
+
+---
+
+## 🧰 Built With
+
+- **Framework**: [Next.js 15](https://nextjs.org/) (App Router, React 18, TypeScript)
+- **Styling**: [TailwindCSS](https://tailwindcss.com/), Lucide Icons
+- **AI Engines**: Google Gemini AI (`@google/generative-ai`), Anthropic Claude (`@anthropic-ai/sdk`)
+- **Code Execution**: [@codesandbox/sandpack-react](https://sandpack.codesandbox.io/)
+- **Database & Auth**: [Prisma ORM](https://www.prisma.io/), [NextAuth.js](https://next-auth.js.org/), PostgreSQL
+- **GitHub Integration**: [@octokit/rest](https://github.com/octokit/rest.js)
+
+---
+
+## 📄 License
+
+This project is licensed under the MIT License — see the LICENSE file for details.

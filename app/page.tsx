@@ -89,14 +89,14 @@ export default function Home() {
 
   // Code Generation Target Language State
   const TARGET_LANGUAGES = [
-    { id: "React (TypeScript)", label: "React (TypeScript)", icon: "⚡" },
-    { id: "React (JavaScript)", label: "React (JavaScript)", icon: "⚛️" },
-    { id: "HTML/CSS/JS", label: "HTML/CSS/JS", icon: "🌐" },
-    { id: "Vue.js", label: "Vue.js", icon: "💚" },
-    { id: "Svelte", label: "Svelte", icon: "🔥" },
-    { id: "Python", label: "Python", icon: "🐍" },
-    { id: "Java", label: "Java", icon: "☕" },
-    { id: "C++", label: "C++", icon: "🚀" },
+    { id: "React (TypeScript)", label: "React (TypeScript)" },
+    { id: "React (JavaScript)", label: "React (JavaScript)" },
+    { id: "HTML/CSS/JS", label: "HTML/CSS/JS" },
+    { id: "Vue.js", label: "Vue.js" },
+    { id: "Svelte", label: "Svelte" },
+    { id: "Python", label: "Python" },
+    { id: "Java", label: "Java" },
+    { id: "C++", label: "C++" },
   ];
   const [targetLanguage, setTargetLanguage] = useState<string>("React (TypeScript)");
   const [isTargetLangDropdownOpen, setIsTargetLangDropdownOpen] = useState<boolean>(false);
@@ -1043,13 +1043,6 @@ export default function Home() {
             </div>
 
             <button
-              onClick={() => setIsDeployModalOpen(true)}
-              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shadow-md shadow-emerald-500/20 active:scale-95 transition"
-            >
-              <UploadCloud className="w-4 h-4" />
-              <span>{t(locale, "nav.deploy")}</span>
-            </button>
-            <button
               onClick={handleNewChat}
               className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-gradient-to-r from-sky-400 to-blue-600 hover:from-sky-500 hover:to-blue-700 text-white text-xs font-bold shadow-md shadow-blue-500/20 active:scale-95 transition"
             >
@@ -1097,13 +1090,12 @@ export default function Home() {
                 </button>
                 <button
                   onClick={() => setScreenMode("leads")}
-                  className={`px-3.5 py-1 rounded-full transition flex items-center gap-1.5 ${
+                  className={`px-3.5 py-1 rounded-full transition ${
                     screenMode === "leads"
                       ? "bg-white text-slate-900 font-bold shadow-sm"
                       : "hover:text-slate-900"
                   }`}
                 >
-                  <Globe className="w-3.5 h-3.5 text-blue-500" />
                   <span>{t(locale, "prompt.googleMapsLeads") || "Google Maps Leads"}</span>
                 </button>
               </div>
@@ -1181,16 +1173,6 @@ export default function Home() {
               {/* Bottom Toolbar & Generate Button */}
               <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-slate-100">
                 <div className="flex items-center gap-2">
-                  <button type="button" onClick={() => setIsDeployModalOpen(true)} className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 transition" title="Deploy Project">
-                    <UploadCloud className="w-4 h-4" />
-                  </button>
-                  <button type="button" onClick={handleDownloadCode} className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 transition" title="Export Code">
-                    <Download className="w-4 h-4" />
-                  </button>
-                  <button type="button" onClick={() => setIsSettingsModalOpen(true)} className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 transition" title="API Keys & Settings">
-                    <Settings className="w-4 h-4" />
-                  </button>
-
                   {/* Target Language Dropdown Selector */}
                   <div className="relative">
                     <button
@@ -1199,9 +1181,6 @@ export default function Home() {
                       className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200/80 border border-slate-200/80 text-xs font-bold text-slate-800 transition cursor-pointer shadow-sm active:scale-95"
                       title="Select Target Language / Framework for Code Generation"
                     >
-                      <span className="text-sm">
-                        {TARGET_LANGUAGES.find((l) => l.id === targetLanguage)?.icon || "⚡"}
-                      </span>
                       <span>{targetLanguage}</span>
                       <ChevronDown className={`w-3.5 h-3.5 text-slate-400 transition-transform duration-200 ${isTargetLangDropdownOpen ? "rotate-180" : ""}`} />
                     </button>
@@ -1227,10 +1206,7 @@ export default function Home() {
                                   : "text-slate-700 hover:bg-slate-50 hover:text-slate-900"
                               }`}
                             >
-                              <span className="flex items-center gap-2">
-                                <span>{lang.icon}</span>
-                                <span>{lang.label}</span>
-                              </span>
+                              <span>{lang.label}</span>
                               {targetLanguage === lang.id && <Check className="w-3.5 h-3.5 text-blue-600 shrink-0" />}
                             </button>
                           ))}
@@ -1290,9 +1266,8 @@ export default function Home() {
                 <div className="bg-white rounded-3xl border border-slate-200/90 shadow-xl overflow-hidden space-y-4 p-5 md:p-6 transition-all">
                   <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-4">
                     <div>
-                      <h2 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
-                        <Globe className="w-4 h-4 text-blue-600" />
-                        <span>Google Maps Lead Results</span>
+                      <h2 className="text-base font-extrabold text-slate-900">
+                        Google Maps Lead Results
                         <span className="px-2 py-0.5 rounded-full bg-blue-50 text-blue-600 text-xs font-bold">
                           {leadsResults.length} leads
                         </span>
@@ -1365,7 +1340,7 @@ export default function Home() {
                               <td className="py-3 px-3">
                                 {lead.review_rating ? (
                                   <span className="font-semibold text-slate-800">
-                                    ⭐ {lead.review_rating} {lead.review_count ? `(${lead.review_count})` : ""}
+                                    {lead.review_rating} {lead.review_count ? `(${lead.review_count})` : ""}
                                   </span>
                                 ) : (
                                   "—"
@@ -1400,180 +1375,7 @@ export default function Home() {
             </div>
           )}
 
-          {/* 5. Projects Section */}
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <h2 className="text-base font-bold text-slate-800 flex items-center gap-2">
-                <Folder className="w-4 h-4 text-slate-600" />
-                <span>{t(locale, "project.history")}</span>
-              </h2>
-            </div>
 
-            {/* Projects Card Grid */}
-            {isProjectsLoading ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-                {[1, 2, 3, 4].map((n) => (
-                  <div key={n} className="bg-white rounded-2xl border border-slate-200 p-3.5 space-y-3 animate-pulse">
-                    <div className="h-36 rounded-xl bg-slate-100"></div>
-                    <div className="h-4 bg-slate-200 rounded w-3/4"></div>
-                    <div className="h-3 bg-slate-100 rounded w-1/2"></div>
-                  </div>
-                ))}
-              </div>
-            ) : projectsList.length === 0 ? (
-              <div className="bg-white rounded-3xl border border-slate-200/80 p-8 text-center space-y-3 max-w-lg mx-auto shadow-sm">
-                <div className="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center mx-auto">
-                  <Folder className="w-6 h-6" />
-                </div>
-                <h3 className="text-sm font-extrabold text-slate-900">No Projects Found</h3>
-                <p className="text-xs text-slate-500">You don't have any saved project history yet. Create your first project using the prompt bar above.</p>
-                <button
-                  onClick={() => {
-                    handleNewChat();
-                  }}
-                  className="px-4 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl shadow-md transition inline-flex items-center gap-1.5"
-                >
-                  <Plus className="w-4 h-4" />
-                  <span>Create New Project</span>
-                </button>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-                {projectsList.map((proj) => (
-                  <div
-                    key={proj.id}
-                    className="group relative bg-white rounded-2xl border border-slate-200/80 p-3.5 space-y-3 hover:shadow-xl hover:-translate-y-1 hover:border-blue-400 cursor-pointer transition-all duration-200 flex flex-col justify-between"
-                  >
-                    {/* Visual Preview Container */}
-                    <div
-                      onClick={() => handleOpenProject(proj)}
-                      className={`h-36 rounded-xl bg-gradient-to-tr ${proj.bg} border border-slate-100 flex items-center justify-center overflow-hidden p-3.5 group-hover:scale-[1.02] transition-transform duration-200 relative`}
-                    >
-                      {renderProjectPreviewMockup(proj.type)}
-
-                      {/* Status Badge Overlay */}
-                      <div className="absolute top-2.5 left-2.5 z-10">
-                        <span
-                          className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold border backdrop-blur-md ${
-                            proj.status === "Deployed"
-                              ? "bg-emerald-50/90 text-emerald-700 border-emerald-200"
-                              : proj.status === "In Review"
-                              ? "bg-blue-50/90 text-blue-700 border-blue-200"
-                              : "bg-slate-100/90 text-slate-600 border-slate-200"
-                          }`}
-                        >
-                          <span
-                            className={`w-1.5 h-1.5 rounded-full ${
-                              proj.status === "Deployed"
-                                ? "bg-emerald-500 animate-pulse"
-                                : proj.status === "In Review"
-                                ? "bg-blue-500"
-                                : "bg-slate-400"
-                            }`}
-                          ></span>
-                          {proj.status}
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Card Content & Action Menu */}
-                    <div className="space-y-2">
-                      <div className="flex items-start justify-between gap-2">
-                        {renamingProjectId === proj.id ? (
-                          <input
-                            type="text"
-                            autoFocus
-                            value={renameTitleInput}
-                            onChange={(e) => setRenameTitleInput(e.target.value)}
-                            onBlur={() => handleRenameProject(proj.id, renameTitleInput)}
-                            onKeyDown={(e) => {
-                              if (e.key === "Enter") handleRenameProject(proj.id, renameTitleInput);
-                              if (e.key === "Escape") setRenamingProjectId(null);
-                            }}
-                            className="w-full text-xs font-bold text-slate-900 border border-blue-400 rounded px-1.5 py-0.5 outline-none"
-                          />
-                        ) : (
-                          <div onClick={() => handleOpenProject(proj)} className="flex-1 min-w-0">
-                            <h3 className="text-xs font-bold text-slate-900 group-hover:text-blue-600 transition truncate">
-                              {proj.title}
-                            </h3>
-                            <p className="text-[11px] text-slate-400 font-medium">{proj.date}</p>
-                          </div>
-                        )}
-
-                        {/* Top-Right Context Menu Icon (...) */}
-                        <div className="relative">
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setActiveCardMenu(activeCardMenu === proj.id ? null : proj.id);
-                            }}
-                            className="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition"
-                            title="More options"
-                          >
-                            <MoreVertical className="w-4 h-4" />
-                          </button>
-
-                          {/* Context Dropdown Menu */}
-                          {activeCardMenu === proj.id && (
-                            <div
-                              onClick={(e) => e.stopPropagation()}
-                              className="absolute right-0 mt-1 w-40 bg-white rounded-xl border border-slate-200 shadow-xl py-1.5 z-30 animate-in fade-in"
-                            >
-                              <button
-                                onClick={() => handleOpenProject(proj)}
-                                className="w-full text-left px-3 py-1.5 text-xs text-slate-700 hover:bg-slate-50 font-medium flex items-center gap-2"
-                              >
-                                <ExternalLink className="w-3.5 h-3.5 text-blue-600" />
-                                <span>Open Project</span>
-                              </button>
-                              <button
-                                onClick={() => {
-                                  setRenamingProjectId(proj.id);
-                                  setRenameTitleInput(proj.title);
-                                  setActiveCardMenu(null);
-                                }}
-                                className="w-full text-left px-3 py-1.5 text-xs text-slate-700 hover:bg-slate-50 font-medium flex items-center gap-2"
-                              >
-                                <Edit3 className="w-3.5 h-3.5 text-slate-500" />
-                                <span>Rename</span>
-                              </button>
-                              <button
-                                onClick={() => handleDuplicateProject(proj)}
-                                className="w-full text-left px-3 py-1.5 text-xs text-slate-700 hover:bg-slate-50 font-medium flex items-center gap-2"
-                              >
-                                <Copy className="w-3.5 h-3.5 text-slate-500" />
-                                <span>Duplicate</span>
-                              </button>
-                              <button
-                                onClick={() => handleDeleteProject(proj.id)}
-                                className="w-full text-left px-3 py-1.5 text-xs text-rose-600 hover:bg-rose-50 font-medium flex items-center gap-2 border-t border-slate-100 mt-1 pt-1.5"
-                              >
-                                <Trash2 className="w-3.5 h-3.5 text-rose-500" />
-                                <span>Delete</span>
-                              </button>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-
-                      {/* Tech Stack Tags */}
-                      <div className="flex flex-wrap gap-1 pt-1">
-                        {proj.tags.map((tag) => (
-                          <span
-                            key={tag}
-                            className="px-2 py-0.5 rounded-md bg-slate-100 text-[10px] font-semibold text-slate-600 border border-slate-200/60"
-                          >
-                            {tag}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
 
           {/* Ready State Status Message */}
           {generatedCode && (
@@ -1589,13 +1391,6 @@ export default function Home() {
                   </div>
                 </div>
                 <div className="flex items-center gap-3 w-full md:w-auto">
-                  <button
-                    onClick={() => setIsDeployModalOpen(true)}
-                    className="flex-1 md:flex-initial px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow-md transition flex items-center justify-center gap-1.5 cursor-pointer"
-                  >
-                    <Rocket className="w-4 h-4" />
-                    <span>{t(locale, "nav.deploy")}</span>
-                  </button>
                   <button
                     onClick={openLivePreviewNewTab}
                     className="flex-1 md:flex-initial px-4 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl shadow-md transition flex items-center justify-center gap-1.5 cursor-pointer"
